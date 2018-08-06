@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Insert Product</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+
+	<div th:fragment="order-full" th:object="${order}">
+		<div class="container-fluid">
+			<table class="table table-striped">
+				<thead class="thead-light">
+					<tr class="d-flex">
+						<th class="col-2">quantity</th>
+						<th class="col-6">name</th>
+						<th class="col-2">unit price</th>
+						<th class="col-2">subtotal</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						th:class='|d-flex ${((updatedItem != null) && updatedItem.equals(item) ? "table-success updated-item":"")}|'
+						th:each=" item : ${order.items}">
+						<td class="col-2">
+							<form th:id="${item.product.id}" action="#"
+								th:action="@{'/' + ${item.product.id}}" method="post">
+								<div class="input-group">
+									<input th:id="${item.product.id}" name="quantity" type="number"
+										min="1" class="form-control" th:onfocusout='|submitForm("${item.product.id}")|'
+										th:value="${item.quantity}">
+								</div>
+							</form>
+						</td>
+						<td class="col-6" th:text="${item.product.name}"></td>
+						<td class="col-2" th:text="${item.product.salePrice}"></td>
+						<td class="col-2"
+							th:text="@{${item.product.salePrice} * ${item.quantity}}"></td>
+					</tr>
+				</tbody>
+			</table>
+			<hr>
+		</div>
+		<div class="container align-self-end">
+			<div class="row">
+				<div class="col-6"></div>
+				<div class=" col-6">
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Total: $</span>
+						</div>
+						<input th:field="${order.total}" id="total" type="number"
+							class="form-control" readonly>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			function submitForm(id) {
+				form = document.getElementById(id);
+				console.log(id);
+				form.submit();
+			}
+			function focusOnUpdatedItem() {
+				var elmnt = document.getElementsByClassName("updated-item")[0];
+				elmnt ? elmnt.scrollIntoView() : null;
+			}
+			focusOnUpdatedItem();
+		</script>
+		<script src="/js/productHelper.js"></script>
+	</div>
+
+</body>

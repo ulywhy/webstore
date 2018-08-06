@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Insert Product</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+
+	<div th:fragment="product-full">
+		<form class="was-validated" action="#" th:action="@{/product}"
+			th:object="${product}" method="post">
+
+			<div class="input-group col-md-4 col-lg-6 mb-3">
+				<input type="text" class="form-control" id="product-name-input"
+					placeholder="Name" onkeyup="productExist()" required autofocus
+					th:field="*{name}" th:readonly="${productState == 'view'}">
+				<div class="input-group-append">
+					<button class="btn btn-outline-info invisible" type="button"
+						id="load-product-button" onclick="loadProduct()">Edit</button>
+				</div>
+			</div>
+
+			<div class="input-group col-md-4 col-lg-6 mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">$</span>
+				</div>
+				<input type="number" min="0" class="form-control"
+					id="product-sale-price-input" placeholder="sale price" required
+					th:field="*{salePrice}" th:readonly="${productState == 'view'}">
+			</div>
+			<div class="input-group col-md-4 col-lg-6 mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text">$</span>
+				</div>
+				<input type="number" min="0" class="form-control"
+					id="product-nuy-price-input" placeholder="buy price"
+					th:field="*{buyPrice}" th:readonly="${productState == 'view'}">
+			</div>
+			<div class="input-group col-md-4 col-lg-6 mb-3">
+				<textarea class="form-control" id="product-description-input"
+					placeholder="Description" th:field="*{description}"
+					th:readonly="${productState == 'view'}"></textarea>
+			</div>
+			<div>
+				<div th:if="${productState == 'edit'}">
+					<input type="submit" value="Update" class="btn btn-success" /> <a
+						class="btn btn-danger" th:href="@{'/product'}">Reset</a>
+				</div>
+				<div th:if="${productState == 'view'}">
+					<a class="btn btn-info" th:href="@{'/product/' + *{id}}">Edit</a>
+					<a class="btn btn-secondary" th:href="@{/product}">Add other</a>
+					<a class="btn btn-light" th:href="@{'/?id=' + *{id}}">Add to Order</a>
+				</div>
+				<div th:if="${productState == 'create'}">
+					<input type="submit" value="Add" class="btn btn-success" /> <input
+						type="reset" value="Reset" class="btn btn-danger" />
+				</div>
+			</div>
+		</form>
+		<script src="/js/productHelper.js"></script>
+	</div>
+
+</body>
