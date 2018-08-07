@@ -10,6 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "orders")
 public class Order {
 
+	@Override
+	public String toString() {
+		return items.toArray().toString();
+	}
+
 	@Id
 	private String _id;
 	private LocalDateTime date;

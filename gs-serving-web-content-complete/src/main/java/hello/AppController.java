@@ -54,7 +54,6 @@ public class AppController {
 		if (id == null) {
 			return "start-page";
 		}
-		System.out.println("updating item to order");
 		Product product = productRepository.findOneById(id);
 		Item item = new Item(product);
 		if (order.getItems().contains(item)) {
@@ -64,6 +63,8 @@ public class AppController {
 		} else {
 			order.addItem(item);
 		}
+		System.out.println("updated: " + item);
+		System.out.println(order);
 		return "start-page";
 	}
 

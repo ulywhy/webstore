@@ -19,52 +19,84 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr
-						th:class='|d-flex ${((updatedItem != null) && updatedItem.equals(item) ? "table-success updated-item":"")}|'
+					<tr th:id='${"item-" + item.product.id}'
+						th:class='|d-flex ${((updatedItem != null) && updatedItem.equals(item) ? "table-success updated-item" : "")}|'
 						th:each=" item : ${order.items}">
-						<td class="col-2">
-							<form th:id="${item.product.id}" action="#"
-								th:action="@{'/' + ${item.product.id}}" method="post">
-								<div class="input-group">
-									<input th:id="${item.product.id}" name="quantity" type="number"
-										min="1" class="form-control" th:onfocusout='|submitForm("${item.product.id}")|'
-										th:value="${item.quantity}">
-								</div>
-							</form>
-						</td>
+
+						<td class="col-2"><input
+							th:id="|quantity-${item.product.id}|" name="quantity"
+							type="number" min="1" class="form-control"
+							th:oninput='|updateSubtotal("${item.product.id}")|'
+							th:value="${item.quantity}"></td>
+
 						<td class="col-6" th:text="${item.product.name}"></td>
-						<td class="col-2" th:text="${item.product.salePrice}"></td>
-						<td class="col-2"
-							th:text="@{${item.product.salePrice} * ${item.quantity}}"></td>
+
+						<td class="col-2" th:id="|price-${item.product.id}|"
+							th:text="|$${item.product.salePrice}|"></td>
+
+						<td class="col-2" th:id="|subtotal-${item.product.id}|"
+							th:text="|$${item.product.salePrice * item.quantity}|"></td>
 					</tr>
 				</tbody>
+				<tfoot>
+					<tr class="d-flex justify-content-end">
+						<td class=" col-2">Total:</td>
+						<td class="col-2" id="total" th:field="${order.total}"
+							th:text="|$${order.total}"></td>
+					</tr>
+				</tfoot>
 			</table>
 			<hr>
 		</div>
-		<div class="container align-self-end">
-			<div class="row">
-				<div class="col-6"></div>
-				<div class=" col-6">
-					<div class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text">Total: $</span>
-						</div>
-						<input th:field="${order.total}" id="total" type="number"
-							class="form-control" readonly>
-					</div>
-				</div>
-			</div>
-		</div>
 		<script>
-			function submitForm(id) {
-				form = document.getElementById(id);
-				console.log(id);
-				form.submit();
+			function updateSubtotal(id) {
+				toogleFocus(id);
+				var subtotal = document.getElementById("subtotal-" + id);
+				var price = getNumberValue(document.getElementById("price-" + id).textContent);
+				var quantity = getNumberValue(document.getElementById("quantity-" + id).value);
+				subtotal.innerHTML = "$" + (price * quantity);
+				updateTotal();
+				serverUpdateOrder(id, quantity);
 			}
+			function serverUpdateOrder(id, quantity) {
+				var req = new XMLHttpRequest();
+				req.open("POST",
+						"http://localhost:8080/" + id + "?quantity=" + quantity, true);
+
+				req.onreadystatechange = function() {
+					if (this.readyState == 4) {
+						//console.log(this.responseText);
+					}
+				};
+				req.send();
+			}
+			
+			function updateTotal() {
+				var subtotals = document.querySelectorAll('[id^="subtotal-"]');
+				var total = 0;
+				subtotals.forEach(s => total += getNumberValue(s.textContent));
+				console.log(total);
+				document.getElementById("total").innerHTML = "$" + total;
+			}
+			
 			function focusOnUpdatedItem() {
 				var elmnt = document.getElementsByClassName("updated-item")[0];
 				elmnt ? elmnt.scrollIntoView() : null;
 			}
+			
+			function toogleFocus(id){
+				var prev = document.getElementsByClassName("table-success")[0]; 
+				var next = document.getElementById("item-" + id);
+				prev.classList.remove("table-success");
+				next.classList.add("table-success");
+			}
+			
+			function getNumberValue(str){
+				console.log("valuestr: " + str);
+				 	var value = parseFloat(str.slice(str.indexOf("$") + 1));
+			 console.log("value: " + value);
+			 return value;}
+			
 			focusOnUpdatedItem();
 		</script>
 		<script src="/js/productHelper.js"></script>
