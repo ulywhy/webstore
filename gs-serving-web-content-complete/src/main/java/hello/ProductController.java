@@ -1,5 +1,7 @@
 package hello;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +19,28 @@ import model.Product;
 @Controller
 public class ProductController {
 
-	Product matchProduct, insertedProduct, actualProduct;
 	@Autowired
 	ProductRepository productRepository;
+
+	@ModelAttribute("product")
+	public Product product() {
+		return new Product();
+	}
 
 	@GetMapping("/product")
 	public String productByName(@RequestParam(value = "name", required = false) String name, Model model) {
 		if (name != null) {
-			model.addAttribute("product", productRepository.findByName(name));
+			Product productMatch = findByName(name);
+			if (productMatch != null) {
+				System.out.println("productMatch" + productMatch);
+				model.addAttribute("product", productMatch);
+			} else {
+				List<Product> productMatches = findLikeName(name);
+				model.addAttribute("products", productMatches);
+			}
 			model.addAttribute("productState", "view");
 		} else {
+			System.out.println("creating new product");
 			model.addAttribute("product", new Product());
 			model.addAttribute("productState", "create");
 		}
@@ -35,7 +49,7 @@ public class ProductController {
 
 	@GetMapping("/product/{id}")
 	public String productForm(@PathVariable("id") String id, Model model) {
-		actualProduct = productRepository.findById(id).get();
+		Product actualProduct = findProductById(id);
 		if (actualProduct != null) {
 			System.out.println("### found product id: " + actualProduct.getId());
 			model.addAttribute("product", actualProduct);
@@ -52,13 +66,12 @@ public class ProductController {
 			Model model) {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("product", "create");
-		} else if (product.getId() == null) {
-			insertProduct(product, model);
 		} else {
-			Product actualProduct = productRepository.findOneById(product.getId());
+			System.out.println(product);
+			Product actualProduct = findByName(product.getName());
 			// the product name changes on update
-			if (!actualProduct.getName().equals(product.getName())) {
-				Product matchProduct = productRepository.findByNameIgnoreCase(product.getName());
+			if (!actualProduct.equals(product)) {
+				Product matchProduct = findByName(product.getName());
 				// edit name matching product instead
 				if (matchProduct != null) {
 					model.addAttribute("product", matchProduct);
@@ -82,9 +95,21 @@ public class ProductController {
 
 	private void insertProduct(Product product, Model model) {
 		System.out.println("### inserting new product: " + product);
-		insertedProduct = productRepository.save(product);
+		Product insertedProduct = productRepository.save(product);
 		model.addAttribute("product", insertedProduct);
 		model.addAttribute("productState", "view");
+	}
+
+	private Product findProductById(String id) {
+		return productRepository.findOneById(id);
+	}
+
+	private Product findByName(String name) {
+		return productRepository.findByNameIgnoreCase(name);
+	}
+
+	private List<Product> findLikeName(String name) {
+		return productRepository.findByNameLikeIgnoreCase(name);
 	}
 
 }

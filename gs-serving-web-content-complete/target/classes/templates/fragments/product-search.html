@@ -25,7 +25,7 @@
 }
 
 /* The search field */
-#myInput {
+#productQuery {
 	border-box: box-sizing;
 	F background-position: 14px 12px;
 	background-repeat: no-repeat;
@@ -36,7 +36,7 @@
 }
 
 /* The search field when it gets focus/clicked on */
-#myInput:focus {
+#productQuery:focus {
 	outline: 3px solid #ddd;
 }
 
@@ -78,10 +78,11 @@
 <body>
 	<div th:fragment="navbar">
 		<div class="dropdown">
-			<form action="#" th:action="@{'/product/}" method="get">
-			<input autocomplete="off" type="text" placeholder="Search product" id="productQuery"
-				onclick="myFunction()" onkeyup="findProductMatches()">
-			<div id="product-matches" class="dropdown-content"></div>
+			<form action="#" th:action="@{'/product/'}" method="get">
+				<input name="name" autocomplete="off" type="text"
+					placeholder="Search product" id="productQuery"
+					onclick="myFunction()" onkeyup="findProductMatches()">
+				<div id="product-matches" class="dropdown-content dropbtn"></div>
 			</form>
 		</div>
 	</div>

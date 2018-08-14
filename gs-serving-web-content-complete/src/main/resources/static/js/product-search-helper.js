@@ -1,18 +1,21 @@
+	var host = "http://" + window.location.host;
+	
 	var findProductMatches = function() {
+		console.log(window.location.host);
 		var query = document.getElementById("productQuery").value;
+		var uri =  host +"/rest/search/findByNameLikeIgnoreCase?name="
+			+ query + "&size=20";
+		console.log(uri);
 		var req = new XMLHttpRequest();
-		req.open("GET",
-				"http://localhost:8080/rest/search/findByNameLikeIgnoreCase?name="
-						+ query + "&size=20", true);
+		req.open("GET", uri, true);
 
 		req.onreadystatechange = function() {
 			if (this.readyState == 4) {
 				var result = JSON.parse(this.responseText);
-				  var  ul, li, a, i;
-				  div = document.getElementById("product-matches");
+			  var div = document.getElementById("product-matches");
 
 				var content = result._embedded.products
-					.map(p => '<a class="dropdown-item" href="http://localhost:8080/product/?name=' + p.name + '">' + p.name +'</a>')
+					.map(p => '<a class="dropdown-item" href="' + host + '/product/?name=' + p.name + '">' + p.name +'</a>')
 					.reduce((outcome, value)=>{
 						return outcome + value;
 				});

@@ -8,46 +8,43 @@
 <body>
 
 	<div th:fragment="order-full" th:object="${order}">
-		<div class="container-fluid">
-			<table class="table table-striped">
-				<thead class="thead-light">
-					<tr class="d-flex">
-						<th class="col-2">quantity</th>
-						<th class="col-6">name</th>
-						<th class="col-2">unit price</th>
-						<th class="col-2">subtotal</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:id='${"item-" + item.product.id}'
-						th:class='|d-flex ${((updatedItem != null) && updatedItem.equals(item) ? "table-success updated-item" : "")}|'
-						th:each=" item : ${order.items}">
+		<table class="table table-striped">
+			<thead class="thead-light">
+				<tr class="d-flex">
+					<th class="col-2">quantity</th>
+					<th class="col-6">name</th>
+					<th class="col-2">unit price</th>
+					<th class="col-2">subtotal</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each=" item : ${order.items}"
+					th:id='${"item-" + item.product.id}'
+					th:class='|d-flex ${((updatedItem != null) && updatedItem.equals(item) ? "table-success updated-item" : "")}|'>
 
-						<td class="col-2"><input
-							th:id="|quantity-${item.product.id}|" name="quantity"
-							type="number" min="1" class="form-control"
-							th:oninput='|updateSubtotal("${item.product.id}")|'
-							th:value="${item.quantity}"></td>
+					<td class="col-2"><input th:id="|quantity-${item.product.id}|"
+						name="quantity" type="number" min="1" class="form-control"
+						th:oninput='|updateSubtotal("${item.product.id}")|'
+						th:value="${item.quantity}"></td>
 
-						<td class="col-6" th:text="${item.product.name}"></td>
+					<td class="col-6" th:text="${item.product.name}"></td>
 
-						<td class="col-2" th:id="|price-${item.product.id}|"
-							th:text="|$${item.product.salePrice}|"></td>
+					<td class="col-2" th:id="|price-${item.product.id}|"
+						th:text="|$${item.product.salePrice}|"></td>
 
-						<td class="col-2" th:id="|subtotal-${item.product.id}|"
-							th:text="|$${item.product.salePrice * item.quantity}|"></td>
-					</tr>
-				</tbody>
-				<tfoot>
-					<tr class="d-flex justify-content-end">
-						<td class=" col-2">Total:</td>
-						<td class="col-2" id="total" th:field="${order.total}"
-							th:text="|$${order.total}"></td>
-					</tr>
-				</tfoot>
-			</table>
-			<hr>
-		</div>
+					<td class="col-2" th:id="|subtotal-${item.product.id}|"
+						th:text="|$${item.product.salePrice * item.quantity}|"></td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr class="d-flex justify-content-end">
+					<td class=" col-2">Total:</td>
+					<td class="col-2" id="total" th:field="${order.total}"
+						th:text="|$${order.total}"></td>
+				</tr>
+			</tfoot>
+		</table>
+		<hr>
 		<script>
 			function updateSubtotal(id) {
 				toogleFocus(id);
@@ -60,15 +57,19 @@
 			}
 			function serverUpdateOrder(id, quantity) {
 				var req = new XMLHttpRequest();
-				req.open("POST",
-						"http://localhost:8080/" + id + "?quantity=" + quantity, true);
+				var params = "?id=" + id + "&quantity=" + quantity;
+				req.open("post",
+						"http://localhost:8080/", true);
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				req.setRequestHeader("Content-length", params.length);
+				req.setRequestHeader("Connection", "close");
 
 				req.onreadystatechange = function() {
 					if (this.readyState == 4) {
 						//console.log(this.responseText);
 					}
 				};
-				req.send();
+				req.send(params);
 			}
 			
 			function updateTotal() {

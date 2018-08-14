@@ -15,7 +15,7 @@ public class Product implements Comparable<Product> {
 	private String id;
 	@Size(min = 2, message = "minimum size of name is 4 characters")
 	@Indexed(unique = true)
-	private String name;
+	private String name = "";
 	@NotNull(message = "price is required")
 	@Min(value = (long) 0.0, message = "prices must be positive values")
 	private Double salePrice;
@@ -25,14 +25,14 @@ public class Product implements Comparable<Product> {
 	public Product() {
 	}
 
-	public Product(String id, String name, double price) {
-		this(name, price);
-		this.id = id;
+	public Product(String id, String name, double salePrice) {
+		this(name, salePrice);
+		this.setId(id);
 	}
 
-	public Product(String name, double price) {
-		this.name = name;
-		this.salePrice = price;
+	public Product(String name, double salePrice) {
+		this.setName(name);
+		this.setSalePrice(salePrice);
 	}
 
 	@Override
@@ -41,9 +41,8 @@ public class Product implements Comparable<Product> {
 				description);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		return this.getId().equals(((Product) obj).getId());
+	public boolean equals(Product product) {
+		return this.getId().equals(product.getId());
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class Product implements Comparable<Product> {
 	}
 
 	public String getName() {
-		return name;
+		return name.toLowerCase();
 	}
 
 	public void setName(String name) {

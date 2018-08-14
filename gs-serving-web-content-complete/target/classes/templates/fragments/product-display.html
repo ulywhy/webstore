@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Insert Product</title>
+<title>Product</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 </head>
@@ -10,7 +10,9 @@
 	<div th:fragment="product-full">
 		<form class="was-validated" action="#" th:action="@{/product}"
 			th:object="${product}" method="post">
-
+			<input type="hidden" th:field="*{id}">
+			<!-- 
+				 -->
 			<div class="input-group col-md-4 col-lg-6 mb-3">
 				<input type="text" class="form-control" id="product-name-input"
 					placeholder="Name" onkeyup="productExist()" required autofocus
@@ -29,6 +31,7 @@
 					id="product-sale-price-input" placeholder="sale price" required
 					th:field="*{salePrice}" th:readonly="${productState == 'view'}">
 			</div>
+
 			<div class="input-group col-md-4 col-lg-6 mb-3">
 				<div class="input-group-prepend">
 					<span class="input-group-text">$</span>
@@ -48,10 +51,12 @@
 						class="btn btn-danger" th:href="@{'/product'}">Reset</a>
 				</div>
 				<div th:if="${productState == 'view'}">
-					<a class="btn btn-info" th:href="@{'/product/' + *{id}}">Edit</a>
-					<a class="btn btn-secondary" th:href="@{/product}">Add other</a>
-					<a class="btn btn-light" th:href="@{'/?id=' + *{id}}">Add to Order</a>
+					<a class="btn btn-info" th:href="@{'/product/' + *{id}}">Edit</a> <a
+						class="btn btn-secondary" th:href="@{/product}">Add other</a> <a
+						class="btn btn-light" th:href="@{'/order/' + *{id}}">Add to
+						Order</a>
 				</div>
+
 				<div th:if="${productState == 'create'}">
 					<input type="submit" value="Add" class="btn btn-success" /> <input
 						type="reset" value="Reset" class="btn btn-danger" />
@@ -59,6 +64,27 @@
 			</div>
 		</form>
 		<script src="/js/productHelper.js"></script>
+	</div>
+	<div th:fragment="product-list">
+		<div class="container">
+			<table class="table table-hover table-striped">
+				<tbody>
+					<tr class="d-flex" th:each="product : ${products}"
+						th:id="${product.id}" onclick="myFunction(this)">
+						<td class="col" th:text="${product.name}"></td>
+						<td class="col" th:text="${product.salePrice}"></td>
+						<td class="col">add to order</td>
+					</tr>
+				</tbody>
+			</table>
+			<script>
+				function myFunction(element) {
+					console.log(element.id);
+					window.location.replace("http://localhost:8080/order/"
+							+ element.id);
+				}
+			</script>
+		</div>
 	</div>
 
 </body>

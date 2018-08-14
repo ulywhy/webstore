@@ -16,7 +16,7 @@ import model.Product;
 
 @Controller
 @SessionAttributes("order")
-public class AppController {
+public class OrderController {
 
 	@Autowired
 	ProductRepository productRepository;
@@ -31,29 +31,45 @@ public class AppController {
 		return new Product();
 	}
 
+	@GetMapping("/order/print")
+	public String greeting(@ModelAttribute("order") Order order, Model model) {
+		if (order != null) {
+			System.out.println("printing order");
+			// release session
+		}
+		return "print-page";
+	}
+
 	@GetMapping("/")
 	public String greeting(@RequestParam(value = "id", required = false) String id,
 			@ModelAttribute("order") Order order, Model model) {
-		if (id == null) {
-			return "start-page";
-		}
-		System.out.println("adding item to order");
-		Product product = productRepository.findOneById(id);
-		Item item = new Item(product);
-		if (order.getItems().contains(item)) {
-			model.addAttribute("updatedItem", item);
-		} else {
-			order.addItem(item);
-		}
 		return "start-page";
 	}
 
-	@PostMapping("/{id}")
-	public String uptateOrder(@PathVariable("id") String id, @ModelAttribute("quantity") int quantity,
-			@ModelAttribute("order") Order order, Model model) {
-		if (id == null) {
-			return "start-page";
+	@GetMapping("/order")
+	public String getOrder(@ModelAttribute("order") Order order, Model model) {
+		return "order-view";
+	}
+
+	@GetMapping("/order/{id}")
+	public String updateOrder(@PathVariable("id") String id, @ModelAttribute("order") Order order, Model model) {
+		Product product = productRepository.findOneById(id);
+		Item item = new Item(product);
+		if (order.getItems().contains(item)) {
+			order.addItem(item);
+		} else {
+			order.addItem(item);
 		}
+		model.addAttribute("updatedItem", item);
+
+		System.out.println("updated: " + item);
+		System.out.println(order);
+		return "order-view";
+	}
+
+	@PostMapping("/order/{id}")
+	public String uptateOrder(@PathVariable("id") String id, @ModelAttribute(value = "quantity") int quantity,
+			@ModelAttribute("order") Order order, Model model) {
 		Product product = productRepository.findOneById(id);
 		Item item = new Item(product);
 		if (order.getItems().contains(item)) {
@@ -65,7 +81,6 @@ public class AppController {
 		}
 		System.out.println("updated: " + item);
 		System.out.println(order);
-		return "start-page";
+		return "order-view";
 	}
-
 }

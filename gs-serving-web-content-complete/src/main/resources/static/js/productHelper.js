@@ -1,10 +1,11 @@
 var productMatchId;
+var host = "http://" + window.location.host;
+
 var productExist = function() {
 	var query = document.getElementById("product-name-input").value;
 	console.log("checking for: " + query);
 	var req = new XMLHttpRequest();
-	req.open("GET",
-			"http://localhost:8080/rest/search/findByNameLikeIgnoreCase?name="
+	req.open("GET", host + "/rest/search/findByNameLikeIgnoreCase?name="
 					+ query, true);
 
 	req.onreadystatechange = function() {
@@ -27,6 +28,6 @@ var productExist = function() {
 }
 var loadProduct = function() {
 	console.log("redirecting");
-	window.location.replace("http://localhost:8080/product/"
+	window.location.replace(host + "/product/"
 			+ productMatchId);
 }
